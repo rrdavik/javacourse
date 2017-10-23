@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans
+xmlns="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:aop="http://www.springframework.org/schema/aop"
+xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
+	http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.2.xsd">
+
+<!--   inyeccion de dependencias por setter -->
+<bean id="helloWorld" class="com.privalia.presentation.HelloWorld">
+	<property name="hello" value="Hola Mundo!"></property>
+</bean>
+
+<!--   inyeccion de dependencias por constructor -->
+<bean id="helloWorldConstructor" class="com.privalia.presentation.HelloWorld">
+	<constructor-arg index="0" value="Hola Mundo From Constructor!" type="java.lang.String"></constructor-arg>
+</bean>
+
+<bean id="student" class="com.privalia.entity.Student">
+	<property name="idStudent" value="1"></property>
+	 	<property name="name" value="David"></property>
+	 		<property name="surname" value="Rodriguez ruiz"></property>
+	 			<property name="age" value="39"></property>
+	 				<property name="address">
+	 					<ref bean="address"></ref>
+	 				</property>
+</bean>
+
+<bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+	<property name="location">
+		<value>config.properties</value>
+	</property>
+</bean>
+
+<bean id="studentConstructor" class="com.privalia.entity.Student">
+<constructor-arg index="0" value="${student.idStudent}" type="int"></constructor-arg>
+<constructor-arg index="1" value="${student.name}" type="java.lang.String"></constructor-arg>
+<constructor-arg index="2" value="${student.surname}" type="java.lang.String"></constructor-arg>
+<constructor-arg index="3" value="${student.age}" type="int"></constructor-arg>
+<constructor-arg index="4" ref="address"  type="com.privalia.entity.Address"></constructor-arg>
+</bean>
+
+<bean id="address" class="com.privalia.entity.Address">
+	<property name="idAddress" value="10"></property>
+	<property name="street" value="Paseo Montjuic 44"></property>
+</bean>
+
+<bean id="StudentWithTeacher" class="com.privalia.entity.listas.Student">
+	<property name="idStudent" value="1"></property>
+		 	<property name="name" value="David"></property>
+		 		<property name="surname" value="Rodriguez ruiz"></property>
+		 			<property name="age" value="39"></property>
+		<property name="teachers">
+		<list>
+			<bean class="com.privalia.entity.listas.Teacher">
+				<property name="name" value="mkyongList" />
+				<property name="idTeacher" value="1" />
+			</bean>
+			<bean class="com.privalia.entity.listas.Teacher">
+				<property name="name" value="Kuon yon mibn" />
+				<property name="idTeacher" value="2" />
+			</bean>
+		</list>
+	</property>
+</bean>
+
+
+<!-- <bean id="listTeachers" class="java.util.List"> -->
+<!-- <list> -->
+<!-- 			<bean class="com.privalia.entity.listas.Teacher"> -->
+<!-- 				<property name="name" value="mkyongList" /> -->
+<!-- 				<property name="idTeacher" value="1" /> -->
+<!-- 			</bean> -->
+<!-- 			<bean class="com.privalia.entity.listas.Teacher"> -->
+<!-- 				<property name="name" value="Kuon yon mibn" /> -->
+<!-- 				<property name="idTeacher" value="2" /> -->
+<!-- 			</bean> -->
+<!-- 		</list> -->
+<!-- </bean> -->
+	<bean id="compra" class="com.privalia.aspectos.Comprar"/>
+ 
+	<bean id="validarCompra" class="com.privalia.aspectos.ValidarMaterial"/>
+ 
+	<aop:config>
+		<aop:aspect ref="validarCompra">
+			<aop:pointcut expression="execution( * com.privalia.aspectos.Comprar.compra(..) )" id="compraPoinCut"/>
+ 
+			<!-- Antes de comprar comprobamos la cantidad -->
+			<aop:before pointcut-ref="compraPoinCut" method="comprobarCantidad"/>
+ 
+			<!-- Despues si todo va bien, lo empaquetamos -->
+			<aop:after-returning pointcut-ref="compraPoinCut" method="empaquetar"/>
+ 
+			<!-- En caso de error, ponemos una reclamacion -->
+			<aop:after-throwing pointcut-ref="compraPoinCut" method="ponerReclamacion"/>
+		</aop:aspect>
+</aop:config>
+
+</beans>

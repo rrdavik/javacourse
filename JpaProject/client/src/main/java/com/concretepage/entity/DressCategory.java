@@ -10,6 +10,9 @@ import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 @Entity
 @Table(name = "test_dress_category")
 public class DressCategory {
@@ -44,6 +47,7 @@ public class DressCategory {
 	}
 	
 	 @OneToMany(mappedBy = "dressCategory", cascade = CascadeType.ALL)
+	 @JsonManagedReference
 	    public Set<Dress> getDresses() {
 	        return dresses;
 	    }
